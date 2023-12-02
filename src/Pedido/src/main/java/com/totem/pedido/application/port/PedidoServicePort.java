@@ -1,5 +1,6 @@
 package com.totem.pedido.application.port;
 
+import com.totem.pedido.domain.DadosClienteException;
 import com.totem.pedido.domain.Pedido;
 import com.totem.pedido.domain.StatusPedido;
 
@@ -9,6 +10,8 @@ import java.util.Optional;
 public interface PedidoServicePort {
 
     Pedido criarPedido(Pedido pedido) throws InterruptedException;
+
+    Pedido criarPedidoComDadosCliente(Pedido pedido) throws DadosClienteException;
 
     Optional<Pedido> buscarPedidoPorId(Long id);
 
@@ -21,4 +24,6 @@ public interface PedidoServicePort {
     Pedido atualizarStatusPedido(Long id, StatusPedido novoStatus);
 
     Pedido prepararPedido(Long id);
+
+
 }
