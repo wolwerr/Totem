@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
+
 
 
 @Service
@@ -21,37 +21,27 @@ public class PedidoServiceImpl implements PedidoServicePort {
 
     private final PedidoRepository pedidoRepository;
 
-    private BlockingQueue<Map.Entry<Long, String>> clienteDataQueue;
+
 
     @Autowired
     public PedidoServiceImpl(PedidoRepository pedidoRepository, BlockingQueue<Map.Entry<Long, String>> clienteDataQueue) {
         this.pedidoRepository = pedidoRepository;
-        this.clienteDataQueue = clienteDataQueue;
     }
 
     @Override
     public Pedido criarPedido(Pedido pedido) {
         try {
-            // Aguarda até que os dados do cliente estejam disponíveis na fila por no máximo 5 segundos
-            Map.Entry<Long, String> clienteData = clienteDataQueue.poll(5, TimeUnit.SECONDS);
+            // Configure dados adicionais do pedido
+            pedido.setDataCriacao(new Date());
+            pedido.setStatus(StatusPedido.RECEBIDO);
 
-            if (clienteData != null) {
-                pedido.setClienteId(clienteData.getKey());
-                pedido.setNomeCliente(clienteData.getValue());
-                pedido.setDataCriacao(new Date());
-                pedido.setStatus(StatusPedido.RECEBIDO);
-                pedido.setItens(pedido.getItens());
-                pedido.setValorTotal(pedido.getValorTotal());
-                System.out.println("Pedido criado com sucesso!");
-                return pedidoRepository.save(pedido);
-            } else {
-                // Lança um erro se os dados do cliente não estiverem disponíveis após 5 segundos
-                throw new RuntimeException("Dados do cliente não estão disponíveis a tempo.");
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            // Trate a interrupção, se necessário
-            throw new RuntimeException("O processo foi interrompido.");
+            // Salvar o pedido no banco de dados
+            System.out.println("Pedido criado com sucesso!");
+            return pedidoRepository.save(pedido);
+
+        } catch (Exception e) {
+            // Tratar exceções específicas se necessário
+            throw new RuntimeException("Erro ao criar o pedido: " + e.getMessage());
         }
     }
 

@@ -7,15 +7,18 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
+import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 
+
 public class PedidoKafkaConsumer {
     private final KafkaConsumer<String, String> consumer;
-    private final BlockingQueue<String> clienteDataQueue;
+    private final BlockingQueue<Map.Entry<Long, String>> clienteDataQueue;
 
-    public PedidoKafkaConsumer(String servers, String topic, BlockingQueue<String> clienteDataQueue) {
+    public PedidoKafkaConsumer(String servers, String topic, BlockingQueue<Map.Entry<Long, String>> clienteDataQueue) {
         this.clienteDataQueue = clienteDataQueue;
 
         Properties props = new Properties();
@@ -35,12 +38,15 @@ public class PedidoKafkaConsumer {
                 for (ConsumerRecord<String, String> record : records) {
                     System.out.printf("Mensagem recebida - Tópico: %s, Chave: %s, Valor: %s%n", record.topic(), record.key(), record.value());
                     try {
-                        String clienteData = record.value();
-                        clienteDataQueue.put(clienteData);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        System.err.println("Consumidor Kafka interrompido.");
-                        return;
+                        Long clienteId = Long.parseLong(record.key());
+                        String clienteNome = record.value();
+                        clienteDataQueue.put(new AbstractMap.SimpleEntry<>(clienteId, clienteNome));
+                    } catch (NumberFormatException | InterruptedException e) {
+                        System.err.println("Erro ao processar a mensagem: " + e.getMessage());
+                        if (e instanceof InterruptedException) {
+                            Thread.currentThread().interrupt();
+                            return;
+                        }
                     }
                 }
             }
