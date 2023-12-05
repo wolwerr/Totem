@@ -17,22 +17,21 @@ FROM amazoncorretto:21-alpine-jdk
 # Definindo metadados da imagem
 LABEL maintainer="ricardo@ricardo.net"
 LABEL version="1.0"
-LABEL description="Totem - Pedido"
-LABEL name="Pedido"
+LABEL description="Totem - Cliente"
+LABEL name="Cliente"
 
 # Expondo a porta em que a aplicação vai rodar
-EXPOSE 8083
-
+EXPOSE 8082
 # Definindo variáveis de ambiente para configuração do banco de dados
 # Os valores reais devem ser fornecidos durante a execução do contêiner
 ENV DATABASE_HOST localhost
-ENV DATABASE_PORT 3306
+ENV DATABASE_PORT 3308
 ENV DATABASE_NAME mydatabase
 ENV DATABASE_USER root
 ENV DATABASE_PASSWORD my-secret-pw
 
 # Copiando o JAR construído na primeira etapa
-COPY --from=build /workspace/target/Pedido-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /workspace/target/Cliente-0.0.1-SNAPSHOT.jar app.jar
 
 # Definindo o ponto de entrada para executar a aplicação
 ENTRYPOINT ["java", "-jar", "/app.jar"]

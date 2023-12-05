@@ -19,7 +19,7 @@ public class KafkaConfig {
     @Bean
     public PedidoKafkaConsumer pedidoKafkaConsumer() {
         String servers = "localhost:9092";
-        String topic = "clientePedidoTopic";
+        String topic = "totem";
         BlockingQueue<Map.Entry<Long, String>> queue = clienteDataQueue();
         return new PedidoKafkaConsumer(servers, topic, queue);
     }

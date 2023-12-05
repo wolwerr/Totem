@@ -25,4 +25,6 @@ public class Pedido {
     private StatusPedido status;
     private String itens;
     private Double valorTotal;
+    @Enumerated(EnumType.STRING)
+    private StatusPagamento statusPagamento;
 }

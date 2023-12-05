@@ -4,6 +4,7 @@ import com.totem.cliente.application.port.ClienteServicePort;
 import com.totem.cliente.domain.Cliente;
 import com.totem.cliente.infrastructure.config.ClienteKafkaProducer;
 import com.totem.cliente.infrastructure.repository.ClienteRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,10 +21,22 @@ public class ClienteServiceImpl implements ClienteServicePort {
         this.clienteRepository = clienteRepository;
     }
 
+    @Value("${spring.kafka.producer.bootstrap-servers}")
+    private String bootstrapServers;
+
+    @Value("${spring.kafka.producer.topic}")
+    private String topic;
+
     @Override
     public Cliente criarCliente(Cliente cliente) {
+        if (cliente.getNome() == null) {
+            String naoId = "NÃO IDENTIFICADO";
+            cliente.setNome(naoId);
+            cliente.setCpf(naoId);
+            cliente.setEmail(naoId);
+        }
         Cliente novoCliente = clienteRepository.save(cliente);
-        ClienteKafkaProducer producer = new ClienteKafkaProducer("localhost:9092", "clientePedidoTopic");
+        ClienteKafkaProducer producer = new ClienteKafkaProducer(bootstrapServers, topic);
         try {
             producer.enviarMensagemCliente(novoCliente);
         } catch (Exception e) {

@@ -23,7 +23,7 @@ public class PedidoKafkaConsumer {
 
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "pedido-consumer-group");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "totem");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
