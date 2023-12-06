@@ -8,22 +8,22 @@ services:
     ports:
       - "8082:8082"
     depends_on:
-      - db_cliente
+      - dbcliente
     environment:
-      - DATABASE_HOST=db_cliente
+      - DATABASE_HOST=dbcliente
       - DATABASE_USER=root
       - DATABASE_PASSWORD=my-secret-pw
       - DATABASE_NAME=mydatabase
 
-  db_cliente:
+  dbcliente:
     image: mysql:latest
     ports:
-      - "3308:3306"
+      - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=my-secret-pw
       - MYSQL_DATABASE=mydatabase
     volumes:
-      - mysql_data:/var/lib/mysql
+      - dbcliente_data:/var/lib/mysql
 
   zookeeper:
     image: wurstmeister/zookeeper
@@ -45,4 +45,4 @@ services:
       - zookeeper
 
 volumes:
-  mysql_data:
+  dbcliente_data:
