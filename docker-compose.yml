@@ -1,29 +1,31 @@
 version: '3.8'
 
 services:
-  db_pagamento:
+  dbpagamento:
     image: mysql:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: my-secret-pw
-      MYSQL_DATABASE: db_pagamento
-    ports:
-      - "3307:3306"
-
-  db_cliente:
-    image: mysql:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: my-secret-pw
-      MYSQL_DATABASE: db_cliente
     ports:
       - "3308:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+      - MYSQL_DATABASE=mydatabase
+    volumes:
+      - dbpagamento_data:/var/lib/mysql
 
-  db_pedido:
+  dbcliente:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: my-secret-pw
-      MYSQL_DATABASE: db_pedido
+      MYSQL_DATABASE: mydatabase
     ports:
-      - "3309:3306"
+      - "3306:3306"
+
+  dbpedido:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: mydatabase
+    ports:
+      - "3307:3306"
 
   kafka:
     image: wurstmeister/kafka
@@ -45,18 +47,43 @@ services:
       context: ./src/Pagamento
       dockerfile: Dockerfile
     ports:
-      - "8081:8080"
+      - "8081:8081"
+    depends_on:
+      - dbpagamento
+    environment:
+      - DATABASE_HOST=dbpagamento
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=my-secret-pw
+      - DATABASE_NAME=mydatabase
 
   cliente:
     build:
       context: ./src/Cliente
       dockerfile: Dockerfile
     ports:
-      - "8082:8080"
+      - "8082:8082"
+    depends_on:
+      - dbcliente
+    environment:
+      - DATABASE_HOST=dbcliente
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=my-secret-pw
+      - DATABASE_NAME=mydatabase
 
   pedido:
     build:
       context: ./src/Pedido
       dockerfile: Dockerfile
     ports:
-      - "8083:8080"
+      - "8083:8083"
+    depends_on:
+      - dbpedido
+    environment:
+      - DATABASE_HOST=dbpedido
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=my-secret-pw
+      - DATABASE_NAME=mydatabase
+
+
+volumes:
+  dbpagamento_data:
