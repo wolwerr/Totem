@@ -15,8 +15,6 @@ public class ClienteServiceImpl implements ClienteServicePort {
 
     private final ClienteRepository clienteRepository;
 
-
-
     public ClienteServiceImpl(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
     }
