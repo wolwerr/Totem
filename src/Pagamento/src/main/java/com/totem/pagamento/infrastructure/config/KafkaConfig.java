@@ -18,7 +18,7 @@ public class KafkaConfig {
 
     @Bean
     public PagamentoKafkaConsumer pedidoKafkaConsumer() {
-        String servers = "localhost:9092";
+        String servers = "kafka:9092";
         String topic = "pedido-pagamento";
         BlockingQueue<Map.Entry<Long, Double>> queue = pedidoDataQueue();
         return new PagamentoKafkaConsumer(servers, topic, queue);

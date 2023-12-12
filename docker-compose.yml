@@ -8,8 +8,6 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=my-secret-pw
       - MYSQL_DATABASE=mydatabase
-    volumes:
-      - dbpagamento_data:/var/lib/mysql
 
   dbcliente:
     image: mysql:latest
@@ -84,6 +82,16 @@ services:
       - DATABASE_PASSWORD=my-secret-pw
       - DATABASE_NAME=mydatabase
 
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
 
-volumes:
-  dbpagamento_data:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"

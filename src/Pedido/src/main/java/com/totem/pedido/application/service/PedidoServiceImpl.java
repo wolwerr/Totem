@@ -1,6 +1,5 @@
 package com.totem.pedido.application.service;
 
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.totem.pedido.application.port.PedidoServicePort;
