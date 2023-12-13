@@ -35,6 +35,7 @@ public class PedidoServiceImpl implements PedidoServicePort {
 
     @Value("${spring.kafka.producer.topic}")
     private String topic;
+
     @Override
     public Pedido criarPedidoComDadosCliente(Pedido pedido) throws DadosClienteException {
         try {
@@ -44,21 +45,17 @@ public class PedidoServiceImpl implements PedidoServicePort {
             }
             Long clienteId = clienteData.getKey();
             String clienteJson = clienteData.getValue();
-
-            try {
-                configurarDadosClienteEmPedido(clienteJson, pedido);
-            } catch (IOException e) {
-                throw new DadosClienteException("Erro ao processar dados do cliente: " + e.getMessage(), e);
-            }
+            configurarDadosClienteEmPedido(clienteJson, pedido);
             if (!pedido.getClienteId().equals(clienteId)) {
                 throw new DadosClienteException("Inconsistência nos dados do cliente.");
             }
             return criarPedido(pedido);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             Thread.currentThread().interrupt();
-            throw new DadosClienteException("Operação interrompida enquanto esperava os dados do cliente.", e);
+            throw new DadosClienteException("Erro ao processar dados do cliente: " + e.getMessage(), e);
         }
     }
+
     @Override
     public Pedido criarPedido(Pedido pedido) {
         pedido.setDataCriacao(new Date());
@@ -96,6 +93,8 @@ public class PedidoServiceImpl implements PedidoServicePort {
         return pedidoRepository.findAll();
     }
 
+    String erro = "Pedido não encontrado";
+
     @Override
     public Pedido atualizarPedido(Long id, Pedido pedidoAtualizado) {
         return pedidoRepository.findById(id)
@@ -106,7 +105,7 @@ public class PedidoServiceImpl implements PedidoServicePort {
                     pedidoExistente.setValorTotal(pedidoAtualizado.getValorTotal());
                     return pedidoRepository.save(pedidoExistente);
                 })
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> new RuntimeException(erro));
     }
 
     @Override
@@ -120,7 +119,7 @@ public class PedidoServiceImpl implements PedidoServicePort {
                     pedido.setStatus(novoStatus);
                     return pedidoRepository.save(pedido);
                 })
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> new RuntimeException(erro));
     }
 
     public Pedido prepararPedido(Long id) {
@@ -134,6 +133,6 @@ public class PedidoServiceImpl implements PedidoServicePort {
                     }
                     return pedidoRepository.save(pedido);
                 })
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> new RuntimeException(erro));
     }
 }

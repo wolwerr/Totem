@@ -1,6 +1,5 @@
 package com.totem.pagamento.application.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.totem.pagamento.application.port.PagamentoServicePort;
 import com.totem.pagamento.domain.DadosPagamentoException;
 import com.totem.pagamento.domain.FormaPagamento;
@@ -24,8 +23,6 @@ public class PagamentoServiceImpl implements PagamentoServicePort {
 
     private final PagamentoRepository pagamentoRepository;
 
-    private final ObjectMapper mapper;
-
     private final BlockingQueue<Map.Entry<Long, Double>> pagamentoDataQueue;
 
     @Override
@@ -37,15 +34,11 @@ public class PagamentoServiceImpl implements PagamentoServicePort {
             }
             Long pedidoId = pedidoData.getKey();
             Double valorTotal = pedidoData.getValue();
-            try {
-                configurarDadosPedidoEmPagamento(pedidoId, valorTotal, pagamento);
-            } catch (IOException e) {
-                throw new DadosPagamentoException("Erro ao processar dados do pedido: " + e.getMessage(), e);
-            }
+            configurarDadosPedidoEmPagamento(pedidoId, valorTotal, pagamento);
             return criarPagamento(pagamento);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             Thread.currentThread().interrupt();
-            throw new DadosPagamentoException("Operação interrompida enquanto esperava os dados do pedido.", e);
+            throw new DadosPagamentoException("Erro ao processar dados do pedido: " + e.getMessage(), e);
         }
     }
 
