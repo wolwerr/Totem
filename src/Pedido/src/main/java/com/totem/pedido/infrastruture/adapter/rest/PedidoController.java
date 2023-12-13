@@ -4,24 +4,21 @@ package com.totem.pedido.infrastruture.adapter.rest;
 import com.totem.pedido.application.port.PedidoServicePort;
 import com.totem.pedido.domain.DadosClienteException;
 import com.totem.pedido.domain.Pedido;
+import com.totem.pedido.domain.StatusPagamento;
 import com.totem.pedido.domain.StatusPedido;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/pedidos")
 public class PedidoController {
 
     private final PedidoServicePort pedidoService;
-
-    public PedidoController(BlockingQueue<Map.Entry<Long, String>> clienteDataQueue, PedidoServicePort pedidoService) {
-        this.pedidoService = pedidoService;
-    }
 
     @PostMapping
     public ResponseEntity<?> criarPedidoComDadosCliente(@RequestBody Pedido pedido) {
@@ -62,9 +59,15 @@ public class PedidoController {
     }
 
     // Novo endpoint para atualizar o status do pedido
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{id}/statusPedido")
     public ResponseEntity<Pedido> atualizarStatusPedido(@PathVariable Long id, @RequestBody StatusPedido novoStatus) {
         Pedido pedidoAtualizado = pedidoService.atualizarStatusPedido(id, novoStatus);
+        return ResponseEntity.ok(pedidoAtualizado);
+    }
+
+    @PatchMapping("/{id}/statusPagamento")
+    public ResponseEntity<Pedido> atualizarStatusPagamento(@PathVariable Long id, @RequestBody StatusPagamento novoStatus) {
+        Pedido pedidoAtualizado = pedidoService.atualizarStatusPagamento(id, novoStatus);
         return ResponseEntity.ok(pedidoAtualizado);
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.totem.pedido.application.port.PedidoServicePort;
 import com.totem.pedido.domain.DadosClienteException;
 import com.totem.pedido.domain.Pedido;
+import com.totem.pedido.domain.StatusPagamento;
 import com.totem.pedido.domain.StatusPedido;
 import com.totem.pedido.infrastruture.messaging.producer.PedidoKafkaProducer;
 import com.totem.pedido.infrastruture.repository.PedidoRepository;
@@ -59,7 +60,8 @@ public class PedidoServiceImpl implements PedidoServicePort {
     @Override
     public Pedido criarPedido(Pedido pedido) {
         pedido.setDataCriacao(new Date());
-        pedido.setStatus(StatusPedido.RECEBIDO);
+        pedido.setStatusPedido(StatusPedido.RECEBIDO);
+        pedido.setStatusPagamento(StatusPagamento.NAO_RECEBIDO);
         Pedido novoPedido =  pedidoRepository.save(pedido);
 
         PedidoKafkaProducer producer = new PedidoKafkaProducer(bootstrapServers, topic);
@@ -101,8 +103,9 @@ public class PedidoServiceImpl implements PedidoServicePort {
                 .map(pedidoExistente -> {
                     pedidoExistente.setDataCriacao(pedidoAtualizado.getDataCriacao());
                     pedidoExistente.setItens(pedidoAtualizado.getItens());
-                    pedidoExistente.setStatus(pedidoAtualizado.getStatus());
+                    pedidoExistente.setStatusPedido(pedidoAtualizado.getStatusPedido());
                     pedidoExistente.setValorTotal(pedidoAtualizado.getValorTotal());
+                    pedidoExistente.setStatusPagamento(pedidoAtualizado.getStatusPagamento());
                     return pedidoRepository.save(pedidoExistente);
                 })
                 .orElseThrow(() -> new RuntimeException(erro));
@@ -116,7 +119,7 @@ public class PedidoServiceImpl implements PedidoServicePort {
     public Pedido atualizarStatusPedido(Long id, StatusPedido novoStatus) {
         return pedidoRepository.findById(id)
                 .map(pedido -> {
-                    pedido.setStatus(novoStatus);
+                    pedido.setStatusPedido(novoStatus);
                     return pedidoRepository.save(pedido);
                 })
                 .orElseThrow(() -> new RuntimeException(erro));
@@ -125,12 +128,21 @@ public class PedidoServiceImpl implements PedidoServicePort {
     public Pedido prepararPedido(Long id) {
         return pedidoRepository.findById(id)
                 .map(pedido -> {
-                    if (pedido.getStatus() == StatusPedido.RECEBIDO) {
-                        pedido.setStatus(StatusPedido.EMPREPARACAO);
+                    if (pedido.getStatusPedido() == StatusPedido.RECEBIDO) {
+                        pedido.setStatusPedido(StatusPedido.EMPREPARACAO);
                         // Lógica adicional para preparação do pedido
                     } else {
                         throw new RuntimeException("Pedido não está no estado apropriado para preparação");
                     }
+                    return pedidoRepository.save(pedido);
+                })
+                .orElseThrow(() -> new RuntimeException(erro));
+    }
+
+    public Pedido atualizarStatusPagamento(Long id, StatusPagamento novoStatus) {
+        return pedidoRepository.findById(id)
+                .map(pedido -> {
+                    pedido.setStatusPagamento(novoStatus);
                     return pedidoRepository.save(pedido);
                 })
                 .orElseThrow(() -> new RuntimeException(erro));

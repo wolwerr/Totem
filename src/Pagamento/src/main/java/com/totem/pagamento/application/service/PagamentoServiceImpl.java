@@ -46,7 +46,7 @@ public class PagamentoServiceImpl implements PagamentoServicePort {
     public Pagamento criarPagamento(Pagamento pagamento) {
         pagamento.setFormaPagamento(FormaPagamento.QR_CODE);
         pagamento.setDataPagamento(new Date());
-        pagamento.setStatus(StatusPagamento.PENDENTE);
+        pagamento.setStatusPagamento(StatusPagamento.PENDENTE);
         return pagamentoRepository.save(pagamento);
     }
 
@@ -58,6 +58,7 @@ public class PagamentoServiceImpl implements PagamentoServicePort {
 
     @Override
     public void atualizarPagamento(Pagamento pagamento) {
+
         pagamentoRepository.save(pagamento);
     }
 
@@ -76,10 +77,11 @@ public class PagamentoServiceImpl implements PagamentoServicePort {
         return pagamentoRepository.findAll();
     }
 
-    public Pagamento atualizarStatusPagamento(Long id, StatusPagamento novoStatus) {
+    public Pagamento atualizarStatusPagamento(Long id, StatusPagamento novoStatusPagamento) {
         return pagamentoRepository.findById(id)
                 .map(pedido -> {
-                    pedido.setStatus(novoStatus);
+                    pedido.setStatusPagamento(novoStatusPagamento);
+                    pedido.setDataPagamento(new Date());
                     return pagamentoRepository.save(pedido);
                 })
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));

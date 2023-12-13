@@ -58,8 +58,8 @@ public class PagamentoController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Pagamento> atualizarStatusPagamento(@PathVariable Long id, @RequestBody StatusPagamento novoStatus) {
-        Pagamento pagamentoAtualizado = pagamentoService.atualizarStatusPagamento(id, novoStatus);
+    public ResponseEntity<Pagamento> atualizarStatusPagamento(@PathVariable Long id, @RequestBody StatusPagamento novoStatusPagamento) {
+        Pagamento pagamentoAtualizado = pagamentoService.atualizarStatusPagamento(id, novoStatusPagamento);
         return ResponseEntity.ok(pagamentoAtualizado);
     }
 }

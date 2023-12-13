@@ -20,7 +20,7 @@ public class Pagamento {
     @Enumerated(EnumType.STRING)
     private FormaPagamento formaPagamento;
     @Enumerated(EnumType.STRING)
-    private StatusPagamento status;
+    private StatusPagamento statusPagamento;
     private Date dataPagamento;
     private Long pedidoId;
     private Double valorTotal;

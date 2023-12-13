@@ -2,6 +2,7 @@ package com.totem.pedido.application.port;
 
 import com.totem.pedido.domain.DadosClienteException;
 import com.totem.pedido.domain.Pedido;
+import com.totem.pedido.domain.StatusPagamento;
 import com.totem.pedido.domain.StatusPedido;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public interface PedidoServicePort {
     void deletarPedido(Long id);
 
     Pedido atualizarStatusPedido(Long id, StatusPedido novoStatus);
+
+    Pedido atualizarStatusPagamento(Long id, StatusPagamento novoStatus);
 
     Pedido prepararPedido(Long id);
 

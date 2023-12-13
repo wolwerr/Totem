@@ -22,7 +22,7 @@ public class Pedido {
     private String nomeCliente;
     private Date dataCriacao;
     @Enumerated(EnumType.STRING)
-    private StatusPedido status;
+    private StatusPedido statusPedido;
     private String itens;
     private Double valorTotal;
     @Enumerated(EnumType.STRING)

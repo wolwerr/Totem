@@ -21,5 +21,5 @@ public interface PagamentoServicePort {
 
     List<Pagamento> buscarTodosPagamentos();
 
-    Pagamento atualizarStatusPagamento(Long id, StatusPagamento novoStatus);
+    Pagamento atualizarStatusPagamento(Long id, StatusPagamento novoStatusPagamento);
 }
